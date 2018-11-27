@@ -94,7 +94,7 @@ bool monero_transfer_utils::is_tx_spendtime_unlocked(
 }
 //
 CreateTransactionErrorCode _add_pid_to_tx_extra(
-	optional<string> payment_id_string,
+	const optional<string>& payment_id_string,
 	vector<uint8_t> &extra
 ) { // Detect hash8 or hash32 char hex string as pid and configure 'extra' accordingly
 	bool r = false;
@@ -210,7 +210,7 @@ namespace
 void monero_transfer_utils::send_step1__prepare_params_for_get_decoys(
 	Send_Step1_RetVals &retVals,
 	//
-	optional<string> payment_id_string,
+	const optional<string>& payment_id_string,
 	uint64_t sending_amount,
 	bool is_sweeping,
 	uint32_t simple_priority,
@@ -382,7 +382,7 @@ void monero_transfer_utils::send_step2__try_create_transaction(
 	const string &sec_viewKey_string,
 	const string &sec_spendKey_string,
 	const string &to_address_string,
-	optional<string> payment_id_string,
+	const optional<string>& payment_id_string,
 	uint64_t final_total_wo_fee,
 	uint64_t change_amount,
 	uint64_t fee_amount,
@@ -692,7 +692,7 @@ void monero_transfer_utils::convenience__create_transaction(
 	const string &sec_viewKey_string,
 	const string &sec_spendKey_string,
 	const string &to_address_string,
-	optional<string> payment_id_string,
+	const optional<string>& payment_id_string,
 	uint64_t sending_amount,
 	uint64_t change_amount,
 	uint64_t fee_amount,
