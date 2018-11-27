@@ -86,8 +86,7 @@ bool serial_bridge_utils::parsed_json_root(const string &args_string, boost::pro
 {
 //	cout << "args_string: " << args_string << endl;
 	
-	std::stringstream ss;
-	ss << args_string;
+	std::istringstream ss(args_string);
 	try {
 		boost::property_tree::read_json(ss, json_root);
 	} catch (std::exception const& e) {
