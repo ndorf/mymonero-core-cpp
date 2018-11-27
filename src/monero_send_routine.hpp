@@ -69,8 +69,8 @@ namespace monero_send_routine
 		const string dust_threshold; // uint64_string; String(MoneroConstants.dustThreshold, radix: 10)
 	};
 	LightwalletAPI_Req_GetUnspentOuts new__req_params__get_unspent_outs( // used internally and by emscr async send impl
-		const string &from_address_string,
-		const string &sec_viewKey_string
+		string from_address_string,
+		string sec_viewKey_string
 	);
 	typedef std::function<void(
 		LightwalletAPI_Req_GetUnspentOuts, // req_params - use these for making the request

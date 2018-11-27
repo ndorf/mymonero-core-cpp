@@ -72,14 +72,14 @@ optional<uint64_t> _possible_uint64_from_json(
 }
 //
 LightwalletAPI_Req_GetUnspentOuts monero_send_routine::new__req_params__get_unspent_outs(
-	const string &from_address_string,
-	const string &sec_viewKey_string
+	string from_address_string,
+	string sec_viewKey_string
 ) {
 	stringstream dustT_ss;
 	dustT_ss << dust_threshold();
 	return {
-		from_address_string,
-		sec_viewKey_string,
+		std::move(from_address_string),
+		std::move(sec_viewKey_string),
 		"0", // amount - always sent as "0"
 		fixed_mixinsize(),
 		true, // use dust
