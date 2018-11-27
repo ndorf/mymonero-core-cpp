@@ -107,7 +107,7 @@ LightwalletAPI_Req_GetRandomOuts monero_send_routine::new__req_params__get_rando
 }
 //
 LightwalletAPI_Res_GetUnspentOuts monero_send_routine::new__parsed_res__get_unspent_outs(
-	property_tree::ptree &res,
+	const property_tree::ptree &res,
 	const secret_key &sec_viewKey,
 	const secret_key &sec_spendKey,
 	const public_key &pub_spendKey
@@ -149,7 +149,7 @@ LightwalletAPI_Res_GetUnspentOuts monero_send_routine::new__parsed_res__get_unsp
 		};
 	}
 	vector<SpendableOutput> unspent_outs;
-	BOOST_FOREACH(boost::property_tree::ptree::value_type &output_desc, res.get_child("outputs"))
+	BOOST_FOREACH(const boost::property_tree::ptree::value_type &output_desc, res.get_child("outputs"))
 	{
 		assert(output_desc.first.empty()); // array elements have no names
 		//
@@ -191,7 +191,7 @@ LightwalletAPI_Res_GetUnspentOuts monero_send_routine::new__parsed_res__get_unsp
 		}
 		bool isOutputSpent = false; // let's see…
 		{
-			BOOST_FOREACH(boost::property_tree::ptree::value_type &spend_key_image_string, output_desc.second.get_child("spend_key_images"))
+			BOOST_FOREACH(const boost::property_tree::ptree::value_type &spend_key_image_string, output_desc.second.get_child("spend_key_images"))
 			{
 //				cout << "spend_key_image_string: " << spend_key_image_string.second.data() << endl;
 				KeyImageRetVals retVals;
@@ -234,10 +234,10 @@ LightwalletAPI_Res_GetUnspentOuts monero_send_routine::new__parsed_res__get_unsp
 	};
 }
 LightwalletAPI_Res_GetRandomOuts monero_send_routine::new__parsed_res__get_random_outs(
-	property_tree::ptree &res
+	const property_tree::ptree &res
 ) {
 	vector<RandomAmountOutputs> mix_outs;
-	BOOST_FOREACH(boost::property_tree::ptree::value_type &mix_out_desc, res.get_child("amount_outs"))
+	BOOST_FOREACH(const boost::property_tree::ptree::value_type &mix_out_desc, res.get_child("amount_outs"))
 	{
 		assert(mix_out_desc.first.empty()); // array elements have no names
 		auto amountAndOuts = RandomAmountOutputs{};
@@ -251,7 +251,7 @@ LightwalletAPI_Res_GetRandomOuts monero_send_routine::new__parsed_res__get_rando
 			string err_msg = "Random outs: Unrecognized 'amount' format";
 			return {err_msg, none};
 		}
-		BOOST_FOREACH(boost::property_tree::ptree::value_type &mix_out_output_desc, mix_out_desc.second.get_child("outputs"))
+		BOOST_FOREACH(const boost::property_tree::ptree::value_type &mix_out_output_desc, mix_out_desc.second.get_child("outputs"))
 		{
 			assert(mix_out_output_desc.first.empty()); // array elements have no names
 			auto amountOutput = RandomAmountOutput{};

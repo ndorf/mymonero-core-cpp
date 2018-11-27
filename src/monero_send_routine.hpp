@@ -56,7 +56,7 @@ namespace monero_send_routine
 	// Abstracted Send routine
 	// - Accessory types - Callbacks - Data fetch hooks
 	typedef std::function<void(
-		property_tree::ptree // opted not to send str but already parsed structure - this may not be optimal but makes it so that e.g. emscr_async_bridge doesn't have to send the response as an escaped JSON string nor redundantly parse/stringify
+		const property_tree::ptree& // opted not to send str but already parsed structure - this may not be optimal but makes it so that e.g. emscr_async_bridge doesn't have to send the response as an escaped JSON string nor redundantly parse/stringify
 	)> api_fetch_cb_fn;
 	//
 	struct LightwalletAPI_Req_GetUnspentOuts
@@ -165,13 +165,13 @@ namespace monero_send_routine
 		optional<vector<RandomAmountOutputs>> mix_outs;
 	};
 	LightwalletAPI_Res_GetUnspentOuts new__parsed_res__get_unspent_outs(
-		property_tree::ptree &res,
+		const property_tree::ptree &res,
 		const secret_key &sec_viewKey,
 		const secret_key &sec_spendKey,
 		const public_key &pub_spendKey
 	);
 	LightwalletAPI_Res_GetRandomOuts new__parsed_res__get_random_outs(
-		property_tree::ptree &res
+		const property_tree::ptree &res
 	);
 	//
 	// - Routine entrypoint
