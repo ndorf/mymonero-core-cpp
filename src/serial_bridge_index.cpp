@@ -426,7 +426,8 @@ string serial_bridge::send_step1__prepare_params_for_get_decoys(const string &ar
 			boost::property_tree::ptree using_outs_ptree;
 			BOOST_FOREACH(SpendableOutput &out, retVals.using_outs)
 			{ // PROBABLY don't need to shuttle these back (could send only public_key) but consumers might like the feature of being able to send this JSON structure directly back to step2 without reconstructing it for themselves
-				boost::property_tree::ptree out_ptree;
+				auto out_ptree_pair = std::make_pair("", boost::property_tree::ptree{});
+				auto& out_ptree = out_ptree_pair.second;
 				out_ptree.put("amount", std::move(RetVals_Transforms::str_from(out.amount)));
 				out_ptree.put("public_key", out.public_key); // FIXME: no std::move correct?
 				if (out.rct != none) {
@@ -435,7 +436,7 @@ string serial_bridge::send_step1__prepare_params_for_get_decoys(const string &ar
 				out_ptree.put("global_index", std::move(RetVals_Transforms::str_from(out.global_index)));
 				out_ptree.put("index", std::move(RetVals_Transforms::str_from(out.index)));
 				out_ptree.put("tx_pub_key", out.tx_pub_key);
-				using_outs_ptree.push_back(std::make_pair("", out_ptree));
+				using_outs_ptree.push_back(out_ptree_pair);
 			}
 			root.add_child(ret_json_key__send__using_outs(), using_outs_ptree);
 		}
