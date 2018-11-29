@@ -99,7 +99,7 @@ bool serial_bridge_utils::parsed_json_root(const string &args_string, boost::pro
 // Shared - Factories - Return values
 string serial_bridge_utils::ret_json_from_root(const boost::property_tree::ptree &root)
 {
-	stringstream ret_ss;
+	ostringstream ret_ss;
 	boost::property_tree::write_json(ret_ss, root, false/*pretty*/);
 	//
 	return ret_ss.str();

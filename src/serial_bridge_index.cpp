@@ -584,7 +584,7 @@ string serial_bridge::decodeRct(const string &args_string)
 	} catch (std::exception const& e) {
 		return error_ret_json_from_message(e.what());
 	}
-	stringstream decoded_amount_ss;
+	ostringstream decoded_amount_ss;
 	decoded_amount_ss << decoded_amount;
 	//
 	boost::property_tree::ptree root;

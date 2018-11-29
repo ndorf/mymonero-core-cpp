@@ -75,7 +75,7 @@ LightwalletAPI_Req_GetUnspentOuts monero_send_routine::new__req_params__get_unsp
 	string from_address_string,
 	string sec_viewKey_string
 ) {
-	stringstream dustT_ss;
+	ostringstream dustT_ss;
 	dustT_ss << dust_threshold();
 	return {
 		std::move(from_address_string),
@@ -95,7 +95,7 @@ LightwalletAPI_Req_GetRandomOuts monero_send_routine::new__req_params__get_rando
 		if (using_out.rct != none && (*(using_out.rct)).size() > 0) {
 			decoy_req__amounts.push_back("0");
 		} else {
-			stringstream amount_ss;
+			ostringstream amount_ss;
 			amount_ss << using_out.amount;
 			decoy_req__amounts.push_back(amount_ss.str());
 		}
