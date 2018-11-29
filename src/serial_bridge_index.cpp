@@ -73,10 +73,10 @@ string serial_bridge::decode_address(const string &args_string)
 	}
 	boost::property_tree::ptree root;
 	root.put(ret_json_key__isSubaddress(), retVals.isSubaddress);
-	root.put(ret_json_key__pub_viewKey_string(), std::move(*(retVals.pub_viewKey_string)));
-	root.put(ret_json_key__pub_spendKey_string(), std::move(*(retVals.pub_spendKey_string)));
+	root.put(ret_json_key__pub_viewKey_string(), *retVals.pub_viewKey_string);
+	root.put(ret_json_key__pub_spendKey_string(), *retVals.pub_spendKey_string);
 	if (retVals.paymentID_string != none) {
-		root.put(ret_json_key__paymentID_string(), std::move(*(retVals.paymentID_string)));
+		root.put(ret_json_key__paymentID_string(), *retVals.paymentID_string);
 	}
 	//
 	return ret_json_from_root(root);
@@ -117,7 +117,7 @@ string serial_bridge::new_integrated_address(const string &args_string)
 	optional<string> retVal = monero::address_utils::new_integratedAddrFromStdAddr(json_root.get<string>("address"), json_root.get<string>("short_pid"), nettype_from_string(json_root.get<string>("nettype_string")));
 	boost::property_tree::ptree root;
 	if (retVal != none) {
-		root.put(ret_json_key__generic_retVal(), std::move(*retVal));
+		root.put(ret_json_key__generic_retVal(), *retVal);
 	}
 	//
 	return ret_json_from_root(root);
@@ -132,7 +132,7 @@ string serial_bridge::new_payment_id(const string &args_string)
 	optional<string> retVal = monero_paymentID_utils::new_short_plain_paymentID_string();
 	boost::property_tree::ptree root;
 	if (retVal != none) {
-		root.put(ret_json_key__generic_retVal(), std::move(*retVal));
+		root.put(ret_json_key__generic_retVal(), *retVal);
 	}
 	//
 	return ret_json_from_root(root);
@@ -299,8 +299,8 @@ string serial_bridge::validate_components_for_login(const string &args_string)
 	boost::property_tree::ptree root;
 	root.put(ret_json_key__isValid(), retVals.isValid);
 	root.put(ret_json_key__isInViewOnlyMode(), retVals.isInViewOnlyMode);
-	root.put(ret_json_key__pub_viewKey_string(), std::move(retVals.pub_viewKey_string));
-	root.put(ret_json_key__pub_spendKey_string(), std::move(retVals.pub_spendKey_string));
+	root.put(ret_json_key__pub_viewKey_string(), retVals.pub_viewKey_string);
+	root.put(ret_json_key__pub_spendKey_string(), retVals.pub_spendKey_string);
 	//
 	return ret_json_from_root(root);
 }
@@ -429,9 +429,9 @@ string serial_bridge::send_step1__prepare_params_for_get_decoys(const string &ar
 				auto out_ptree_pair = std::make_pair("", boost::property_tree::ptree{});
 				auto& out_ptree = out_ptree_pair.second;
 				out_ptree.put("amount", RetVals_Transforms::str_from(out.amount));
-				out_ptree.put("public_key", out.public_key); // FIXME: no std::move correct?
+				out_ptree.put("public_key", out.public_key);
 				if (out.rct != none) {
-					out_ptree.put("rct", *out.rct); // copy vs move ?
+					out_ptree.put("rct", *out.rct);
 				}
 				out_ptree.put("global_index", RetVals_Transforms::str_from(out.global_index));
 				out_ptree.put("index", RetVals_Transforms::str_from(out.index));
@@ -515,10 +515,10 @@ string serial_bridge::send_step2__try_create_transaction(const string &args_stri
 			root.put(ret_json_key__send__fee_actually_needed(), RetVals_Transforms::str_from(retVals.fee_actually_needed)); // must be passed back
 		} else {
 			root.put(ret_json_key__send__tx_must_be_reconstructed(), false); // so consumers have it available
-			root.put(ret_json_key__send__serialized_signed_tx(), std::move(*(retVals.signed_serialized_tx_string)));
-			root.put(ret_json_key__send__tx_hash(), std::move(*(retVals.tx_hash_string)));
-			root.put(ret_json_key__send__tx_key(), std::move(*(retVals.tx_key_string)));
-			root.put(ret_json_key__send__tx_pub_key(), std::move(*(retVals.tx_pub_key_string)));
+			root.put(ret_json_key__send__serialized_signed_tx(), *retVals.signed_serialized_tx_string);
+			root.put(ret_json_key__send__tx_hash(), retVals.tx_hash_string);
+			root.put(ret_json_key__send__tx_key(), retVals.tx_key_string);
+			root.put(ret_json_key__send__tx_pub_key(), retVals.tx_pub_key_string);
 		}
 	}
 	return ret_json_from_root(root);
