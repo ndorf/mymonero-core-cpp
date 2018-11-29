@@ -385,7 +385,7 @@ string serial_bridge::send_step1__prepare_params_for_get_decoys(const string &ar
 		out.index = stoull(output_desc.second.get<string>("index"));
 		out.tx_pub_key = output_desc.second.get<string>("tx_pub_key");
 		//
-		unspent_outs.push_back(out);
+		unspent_outs.push_back(std::move(out));
 	}
 	optional<string> optl__passedIn_attemptAt_fee_string = json_root.get_optional<string>("passedIn_attemptAt_fee");
 	optional<uint64_t> optl__passedIn_attemptAt_fee = none;
@@ -462,7 +462,7 @@ string serial_bridge::send_step2__try_create_transaction(const string &args_stri
 		out.index = stoull(output_desc.second.get<string>("index"));
 		out.tx_pub_key = output_desc.second.get<string>("tx_pub_key");
 		//
-		using_outs.push_back(out);
+		using_outs.push_back(std::move(out));
 	}
 	vector<RandomAmountOutputs> mix_outs;
 	BOOST_FOREACH(boost::property_tree::ptree::value_type &mix_out_desc, json_root.get_child("mix_outs"))
@@ -477,9 +477,9 @@ string serial_bridge::send_step2__try_create_transaction(const string &args_stri
 			amountOutput.global_index = stoull(mix_out_output_desc.second.get<string>("global_index")); // this is, I believe, presently supplied as a string by the API, probably to avoid overflow
 			amountOutput.public_key = mix_out_output_desc.second.get<string>("public_key");
 			amountOutput.rct = mix_out_output_desc.second.get_optional<string>("rct");
-			amountAndOuts.outputs.push_back(amountOutput);
+			amountAndOuts.outputs.push_back(std::move(amountOutput));
 		}
-		mix_outs.push_back(amountAndOuts);
+		mix_outs.push_back(std::move(amountAndOuts));
 	}
 	Send_Step2_RetVals retVals;
 	monero_transfer_utils::send_step2__try_create_transaction(
@@ -561,7 +561,7 @@ string serial_bridge::decodeRct(const string &args_string)
 		if (!epee::string_tools::hex_to_pod(ecdh_info_desc.second.get<string>("amount"), ecdh_info.amount)) {
 			return error_ret_json_from_message("Invalid rv.ecdhInfo[].amount");
 		}
-		rv.ecdhInfo.push_back(ecdh_info);
+		rv.ecdhInfo.push_back(ecdh_info); // rct keys aren't movable
 	}
 	BOOST_FOREACH(boost::property_tree::ptree::value_type &outPk_desc, rv_desc.get_child("outPk"))
 	{
@@ -571,7 +571,7 @@ string serial_bridge::decodeRct(const string &args_string)
 			return error_ret_json_from_message("Invalid rv.outPk[].mask");
 		}
 		// FIXME: does dest need to be placed on the key?
-		rv.outPk.push_back(outPk);
+		rv.outPk.push_back(outPk); // rct keys aren't movable
 	}
 	//
 	rct::key mask;

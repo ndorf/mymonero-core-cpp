@@ -225,7 +225,7 @@ LightwalletAPI_Res_GetUnspentOuts monero_send_routine::new__parsed_res__get_unsp
 			out.index = output__index;
 			out.tx_pub_key = *optl__tx_pub_key; // just b/c we've already accessed it above
 			//
-			unspent_outs.push_back(out);
+			unspent_outs.push_back(std::move(out));
 		}
 	}
 	return LightwalletAPI_Res_GetUnspentOuts{
@@ -268,9 +268,9 @@ LightwalletAPI_Res_GetRandomOuts monero_send_routine::new__parsed_res__get_rando
 			amountOutput.public_key = mix_out_output_desc.second.get<string>("public_key");
 			amountOutput.rct = mix_out_output_desc.second.get_optional<string>("rct");
 			//
-			amountAndOuts.outputs.push_back(amountOutput);
+			amountAndOuts.outputs.push_back(std::move(amountOutput));
 		}
-		mix_outs.push_back(amountAndOuts);
+		mix_outs.push_back(std::move(amountAndOuts));
 	}
 	return {
 		none, mix_outs

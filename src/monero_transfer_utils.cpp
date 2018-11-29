@@ -185,9 +185,9 @@ namespace
 		CHECK_AND_ASSERT_MES(!vec.empty(), T(), "Vector must be non-empty");
 		CHECK_AND_ASSERT_MES(idx < vec.size(), T(), "idx out of bounds");
 
-		T res = vec[idx];
+		T res = std::move(vec[idx]);
 		if (idx + 1 != vec.size()) {
-			vec[idx] = vec.back();
+			vec[idx] = std::move(vec.back());
 		}
 		vec.resize(vec.size() - 1);
 		
@@ -299,8 +299,8 @@ void monero_transfer_utils::send_step1__prepare_params_for_get_decoys(
 //				cout << "Sweeping and found a dusty but mixable (rct) amount... keeping it!" << endl;
 			}
 		}
-		retVals.using_outs.push_back(out);
 		using_outs_amount += out.amount;
+		retVals.using_outs.push_back(std::move(out));
 //		cout << "Using output: " << out.amount << " - " << out.public_key << endl;
 	}
 	retVals.spendable_balance = using_outs_amount; // must store for needMoreMoneyThanFound return
@@ -336,10 +336,12 @@ void monero_transfer_utils::send_step1__prepare_params_for_get_decoys(
 	} else {
 		total_incl_fees = sending_amount + needed_fee; // because fee changed because using_outs.size() was updated
 		while (using_outs_amount < total_incl_fees && remaining_unusedOuts.size() > 0) { // add outputs 1 at a time till we either have them all or can meet the fee
-			auto out = pop_random_value(remaining_unusedOuts);
-//			cout << "Using output: " << out.amount << " - " << out.public_key << endl;
-			retVals.using_outs.push_back(out);
-			using_outs_amount += out.amount;
+			{
+				auto out = pop_random_value(remaining_unusedOuts);
+				//			cout << "Using output: " << out.amount << " - " << out.public_key << endl;
+				using_outs_amount += out.amount;
+				retVals.using_outs.push_back(std::move(out));
+			}
 			retVals.spendable_balance = using_outs_amount; // must store for needMoreMoneyThanFound return
 			//
 			// Recalculate fee, total incl fees
