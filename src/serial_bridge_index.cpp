@@ -415,26 +415,26 @@ string serial_bridge::send_step1__prepare_params_for_get_decoys(const string &ar
 		root.put(ret_json_key__any__err_msg(), err_msg_from_err_code__create_transaction(retVals.errCode));
 		//
 		// The following will be set if errCode==needMoreMoneyThanFound - and i'm depending on them being 0 otherwise
-		root.put(ret_json_key__send__spendable_balance(), std::move(RetVals_Transforms::str_from(retVals.spendable_balance)));
-		root.put(ret_json_key__send__required_balance(), std::move(RetVals_Transforms::str_from(retVals.required_balance)));
+		root.put(ret_json_key__send__spendable_balance(), RetVals_Transforms::str_from(retVals.spendable_balance));
+		root.put(ret_json_key__send__required_balance(), RetVals_Transforms::str_from(retVals.required_balance));
 	} else {
-		root.put(ret_json_key__send__mixin(), std::move(RetVals_Transforms::str_from(retVals.mixin)));
-		root.put(ret_json_key__send__using_fee(), std::move(RetVals_Transforms::str_from(retVals.using_fee)));
-		root.put(ret_json_key__send__final_total_wo_fee(), std::move(RetVals_Transforms::str_from(retVals.final_total_wo_fee)));
-		root.put(ret_json_key__send__change_amount(), std::move(RetVals_Transforms::str_from(retVals.change_amount)));
+		root.put(ret_json_key__send__mixin(), RetVals_Transforms::str_from(retVals.mixin));
+		root.put(ret_json_key__send__using_fee(), RetVals_Transforms::str_from(retVals.using_fee));
+		root.put(ret_json_key__send__final_total_wo_fee(), RetVals_Transforms::str_from(retVals.final_total_wo_fee));
+		root.put(ret_json_key__send__change_amount(), RetVals_Transforms::str_from(retVals.change_amount));
 		{
 			boost::property_tree::ptree using_outs_ptree;
 			BOOST_FOREACH(SpendableOutput &out, retVals.using_outs)
 			{ // PROBABLY don't need to shuttle these back (could send only public_key) but consumers might like the feature of being able to send this JSON structure directly back to step2 without reconstructing it for themselves
 				auto out_ptree_pair = std::make_pair("", boost::property_tree::ptree{});
 				auto& out_ptree = out_ptree_pair.second;
-				out_ptree.put("amount", std::move(RetVals_Transforms::str_from(out.amount)));
+				out_ptree.put("amount", RetVals_Transforms::str_from(out.amount));
 				out_ptree.put("public_key", out.public_key); // FIXME: no std::move correct?
 				if (out.rct != none) {
 					out_ptree.put("rct", *out.rct); // copy vs move ?
 				}
-				out_ptree.put("global_index", std::move(RetVals_Transforms::str_from(out.global_index)));
-				out_ptree.put("index", std::move(RetVals_Transforms::str_from(out.index)));
+				out_ptree.put("global_index", RetVals_Transforms::str_from(out.global_index));
+				out_ptree.put("index", RetVals_Transforms::str_from(out.index));
 				out_ptree.put("tx_pub_key", out.tx_pub_key);
 				using_outs_ptree.push_back(out_ptree_pair);
 			}
@@ -512,7 +512,7 @@ string serial_bridge::send_step2__try_create_transaction(const string &args_stri
 	} else {
 		if (retVals.tx_must_be_reconstructed) {
 			root.put(ret_json_key__send__tx_must_be_reconstructed(), true);
-			root.put(ret_json_key__send__fee_actually_needed(), std::move(RetVals_Transforms::str_from(retVals.fee_actually_needed))); // must be passed back
+			root.put(ret_json_key__send__fee_actually_needed(), RetVals_Transforms::str_from(retVals.fee_actually_needed)); // must be passed back
 		} else {
 			root.put(ret_json_key__send__tx_must_be_reconstructed(), false); // so consumers have it available
 			root.put(ret_json_key__send__serialized_signed_tx(), std::move(*(retVals.signed_serialized_tx_string)));
