@@ -496,7 +496,7 @@ void monero_transfer_utils::create_transaction(
 		}
 		auto src = tx_source_entry{};
 		src.amount = outputs[out_index].amount;
-		src.rct = outputs[out_index].rct != none && (*(outputs[out_index].rct)).empty() == false;
+		src.rct = outputs[out_index].rct != none && outputs[out_index].rct->empty() == false;
 		//
 		typedef cryptonote::tx_source_entry::output_entry tx_output_entry;
 		if (mix_outs.size() != 0) {
@@ -527,12 +527,12 @@ void monero_transfer_utils::create_transaction(
 				}
 				oe.second.dest = rct::pk2rct(public_key);
 				//
-				if (mix_out__output.rct != boost::none && (*(mix_out__output.rct)).empty() == false) {
+				if (mix_out__output.rct != boost::none && mix_out__output.rct->empty() == false) {
 					rct::key commit;
 					_rct_hex_to_rct_commit(*mix_out__output.rct, commit);
 					oe.second.mask = commit;
 				} else {
-					if (outputs[out_index].rct != boost::none && (*(outputs[out_index].rct)).empty() == false) {
+					if (outputs[out_index].rct != boost::none && outputs[out_index].rct->empty() == false) {
 						retVals.errCode = mixRCTOutsMissingCommit;
 						return;
 					}
@@ -555,7 +555,7 @@ void monero_transfer_utils::create_transaction(
 		}
 		real_oe.second.dest = rct::pk2rct(public_key);
 		//
-		if (outputs[out_index].rct != none && (*(outputs[out_index].rct)).empty() == false) {
+		if (outputs[out_index].rct != none && outputs[out_index].rct->empty() == false) {
 			rct::key commit;
 			_rct_hex_to_rct_commit(*(outputs[out_index].rct), commit);
 			real_oe.second.mask = commit; //add commitment for real input
@@ -587,7 +587,7 @@ void monero_transfer_utils::create_transaction(
 		uint64_t internal_output_index = outputs[out_index].index;
 		src.real_output_in_tx_index = internal_output_index;
 		//
-		src.rct = outputs[out_index].rct != boost::none && (*(outputs[out_index].rct)).empty() == false;
+		src.rct = outputs[out_index].rct != boost::none && outputs[out_index].rct->empty() == false;
 		if (src.rct) {
 			rct::key decrypted_mask;
 			bool r = _rct_hex_to_decrypted_mask(
