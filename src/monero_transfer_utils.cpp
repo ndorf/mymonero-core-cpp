@@ -149,6 +149,10 @@ bool _rct_hex_to_decrypted_mask(
 	if (rct_string.empty()) {
 		return false;
 	}
+	if (rct_string == "coinbase") {
+		decrypted_mask = rct::identity();
+		return true;
+	}
 	// rct_string is a string with length 64+64+64 (<rct commit> + <encrypted mask> + <rct amount>)
 	rct::key encrypted_mask;
 	std::string encrypted_mask_str = rct_string.substr(64,64);
@@ -557,7 +561,9 @@ void monero_transfer_utils::create_transaction(
 		}
 		real_oe.second.dest = rct::pk2rct(public_key);
 		//
-		if (outputs[out_index].rct != none && (*(outputs[out_index].rct)).empty() == false) {
+		if (outputs[out_index].rct != none
+				&& outputs[out_index].rct->empty() == false
+				&& *outputs[out_index].rct != "coinbase") {
 			rct::key commit;
 			_rct_hex_to_rct_commit(*(outputs[out_index].rct), commit);
 			real_oe.second.mask = commit; //add commitment for real input
