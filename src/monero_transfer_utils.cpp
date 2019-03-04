@@ -93,6 +93,7 @@ bool monero_transfer_utils::is_tx_spendtime_unlocked(
 	return false;
 }
 //
+namespace {
 CreateTransactionErrorCode _add_pid_to_tx_extra(
 	const optional<string>& payment_id_string,
 	vector<uint8_t> &extra
@@ -149,12 +150,26 @@ bool _rct_hex_to_decrypted_mask(
 	if (rct_string.empty()) {
 		return false;
 	}
+	// rct_string is a magic value if output is RCT and coinbase
 	if (rct_string == "coinbase") {
 		decrypted_mask = rct::identity();
 		return true;
 	}
-	// rct_string is a string with length 64+64+64 (<rct commit> + <encrypted mask> + <rct amount>)
+	auto make_key_derivation = [&]() {
+		crypto::key_derivation derivation;
+		bool r = generate_key_derivation(tx_pub_key, view_secret_key, derivation);
+		THROW_WALLET_EXCEPTION_IF(!r, error::wallet_internal_error, "Failed to generate key derivation");
+		crypto::secret_key scalar;
+		crypto::derivation_to_scalar(derivation, internal_output_index, scalar);
+		return rct::hash_to_scalar(rct::sk2rct(scalar));
+	};
 	rct::key encrypted_mask;
+	// rct_string is a string with length 64+16 (<rct commit> + <amount>) if RCT version 2
+	if (rct_string.size() < 64 * 2) {
+		decrypted_mask = rct::genCommitmentMask(make_key_derivation());
+		return true;
+	}
+	// rct_string is a string with length 64+64+64 (<rct commit> + <encrypted mask> + <rct amount>)
 	std::string encrypted_mask_str = rct_string.substr(64,64);
 	THROW_WALLET_EXCEPTION_IF(!string_tools::validate_hex(64, encrypted_mask_str), error::wallet_internal_error, "Invalid rct mask: " + encrypted_mask_str);
 	string_tools::hex_to_pod(encrypted_mask_str, encrypted_mask);
@@ -165,12 +180,7 @@ bool _rct_hex_to_decrypted_mask(
 	}
 	//
 	// Decrypt the mask
-	crypto::key_derivation derivation;
-	bool r = generate_key_derivation(tx_pub_key, view_secret_key, derivation);
-	THROW_WALLET_EXCEPTION_IF(!r, error::wallet_internal_error, "Failed to generate key derivation");
-	crypto::secret_key scalar;
-	crypto::derivation_to_scalar(derivation, internal_output_index, scalar);
-	sc_sub(decrypted_mask.bytes, encrypted_mask.bytes, rct::hash_to_scalar(rct::sk2rct(scalar)).bytes);
+	sc_sub(decrypted_mask.bytes, encrypted_mask.bytes, make_key_derivation().bytes);
 	
 	return true;
 }
@@ -180,6 +190,7 @@ bool _verify_sec_key(const crypto::secret_key &secret_key, const crypto::public_
 	bool r = crypto::secret_key_to_public_key(secret_key, calculated_pub);
 	return r && public_key == calculated_pub;
 }
+} // unnamed namespace
 //
 namespace
 {
@@ -618,9 +629,7 @@ void monero_transfer_utils::create_transaction(
 //				return;
 //			}
 		} else {
-			rct::key I;
-			rct::identity(I);
-			src.mask = I; // in the original cn_utils impl this was left as null for generate_key_image_helper_rct to fill in with identity I
+			rct::identity(src.mask); // in the original cn_utils impl this was left as null for generate_key_image_helper_rct to fill in with identity I
 		}
 		// not doing multisig here yet
 		src.multisig_kLRki = rct::multisig_kLRki({rct::zero(), rct::zero(), rct::zero(), rct::zero()});
