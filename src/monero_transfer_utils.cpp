@@ -161,7 +161,7 @@ bool _rct_hex_to_decrypted_mask(
 		THROW_WALLET_EXCEPTION_IF(!r, error::wallet_internal_error, "Failed to generate key derivation");
 		crypto::secret_key scalar;
 		crypto::derivation_to_scalar(derivation, internal_output_index, scalar);
-		return rct::hash_to_scalar(rct::sk2rct(scalar));
+		return rct::sk2rct(scalar);
 	};
 	rct::key encrypted_mask;
 	// rct_string is a string with length 64+16 (<rct commit> + <amount>) if RCT version 2
@@ -180,7 +180,9 @@ bool _rct_hex_to_decrypted_mask(
 	}
 	//
 	// Decrypt the mask
-	sc_sub(decrypted_mask.bytes, encrypted_mask.bytes, make_key_derivation().bytes);
+	sc_sub(decrypted_mask.bytes,
+		encrypted_mask.bytes,
+		rct::hash_to_scalar(make_key_derivation()).bytes);
 	
 	return true;
 }
